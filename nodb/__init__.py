@@ -3,10 +3,14 @@ from io import BytesIO
 
 import base64
 import boto3
-import cPickle as pickle
 import hashlib
 import json
 import uuid
+
+try:
+    import cPickle as pickle
+except Exception:
+    import pickle
 
 s3 = boto3.resource('s3')
 
