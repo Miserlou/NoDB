@@ -23,7 +23,7 @@ class NoDB(object):
     region = "us-east-1"
     serializer = "pickle"
     index = "id"
-    prefix = "nodb/"
+    prefix = ".nodb/"
 
     ##
     # Advanced config

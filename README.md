@@ -20,6 +20,8 @@ Useful for **prototyping**, **casual hacking**, and (maybe) even low-traffic **s
 * Uses S3 as a datastore.
 * Loads to native Python objects with `cPickle`
 * Alternately use JSON as a storage format for untrusted data
+* Cheap!
+* Fast(ish)
 
 ## Installation
 
@@ -30,9 +32,11 @@ $ pip install nodb
 ## Usage
 
 ### Warning!
-_NoDB is **insecure by default**!_ Do not use it for untrusted data before setting `serializer` to `"json"`!_
+_NoDB is **insecure by default**! Do not use it for untrusted data before setting `serializer` to `"json"`!_
 
-**NoDB** is super easy to use. You make a NoDB object, point it to your bucket and tell it what field you want to index on. After that, you can save and load literally anything you want, whenever you want.
+**NoDB** is super easy to use!
+
+You simply make a NoDB object, point it to your bucket and tell it what field you want to index on.
 
 ```python
 # Set it up
@@ -41,17 +45,49 @@ from nodb import NoDB
 nodb = NoDB()
 nodb.bucket = "my-s3-bucket"
 nodb.index = "Name"
+```
 
-# Save an object
+After that, you can save and load literally anything you want, whenever you want!
+
+```python
+# Save an object!
 user = {"Name": "Jeff", "age": 19}
 nodb.save(user)
 
-# Load our object
+# Load our object!
 user = nodb.load("Jeff")
 print user.age # 19
 ```
 
+By default, you can save and load any Python object.
+
 ## Advanced Usage
+
+#### Different Serializers
+
+To use a safer, non-Pickle serializer, just set JSON as your serializer:
+
+```python
+nodb = NoDB()
+nodb.serializer = "json
+```
+
+### Object Metadata
+
+You can get metainfo (datetime and UUID) for a given object by passing `metainfo=True` to `load`, likek so:
+
+```python
+# Load our object and metainfo!
+user, datetime, uuid = nodb.load("Jeff", metainfo=True)
+```
+
+#### Human Readable Indexes
+
+By default, the indexes are hashed. If you want to be able to debug through the AWS console, set `human_readable_indexes` to True:
+
+```python
+nodb.human_readable_indexes = True
+```
 
 ## TODO (Maybe?)
 
@@ -67,7 +103,7 @@ print user.age # 19
 
 ## Related Projects
 
-* [Zappa](https://github.com/Miserlou/Zappa) - Serverless Python
+* [Zappa](https://github.com/Miserlou/Zappa) - Python's server-less framework!
 * [K.E.V.](https://github.com/capless/kev) - a Python ORM for key-value stores based on Redis, S3, and a S3/Redis hybrid backend.
 
 ## Contributing
