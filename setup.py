@@ -24,7 +24,7 @@ setup(
     test_suite='nose.collector',
     include_package_data=True,
     license='MIT License',
-    description='NoDB is not a database.. but it sort of works like one.'
+    description="NoDB isn't a database.. but it sort of looks like one.",
     long_description=README,
     url='https://github.com/Miserlou/NoDB',
     author='Rich Jones',
