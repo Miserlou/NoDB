@@ -13,7 +13,7 @@ _NoDB isn't a database.. but it sort of looks like one!_
 
 **NoDB** an incredibly simple, Pythonic object store based on Amazon's S3 static file storage.
 
-It's useful for **prototyping**, **casual hacking**, and (maybe) even low-traffic **server-less backends**!
+It's useful for **prototyping**, **casual hacking**, and (maybe) even low-traffic **server-less backends** for **[Zappa](https://github.com/Miserlou/Zappa) apps**!
 
 ## Features
 
