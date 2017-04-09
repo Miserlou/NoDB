@@ -1,3 +1,5 @@
+<img src="http://i.imgur.com/ZymFZd8.jpg" width="400"/>
+
 # NoDB
 
 [![Build Status](https://travis-ci.org/Miserlou/NoDB.svg)](https://travis-ci.org/Miserlou/NoDB)
