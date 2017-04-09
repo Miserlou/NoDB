@@ -49,6 +49,16 @@ class TestNoDB(unittest.TestCase):
     def test_nodb(self):
         self.assertTrue(True)
         nodb = NoDB()
+        nodb.index = "Name"
+
+        jeff = {"Name": "Jeff", "age": 19}
+        serialized = nodb._serialize(jeff)
+        nodb._deserialize(serialized)
+
+        nodb.serializer = 'json'
+        nodb.human_readable_indexes = True
+        serialized = nodb._serialize(jeff)
+        nodb._deserialize(serialized)
 
 if __name__ == '__main__':
     unittest.main()
