@@ -9,11 +9,11 @@
 [![Gun.io](https://img.shields.io/badge/made%20by-gun.io-blue.svg)](https://gun.io/)
 [![Patreon](https://img.shields.io/badge/support-patreon-brightgreen.svg)](https://patreon.com/zappa)
 
-NoDB isn't a database.. but it sort of looks like one.
+_NoDB isn't a database.. but it sort of looks like one!_
 
-It's an incredibly simple Pythonic object store based on S3.
+**NoDB** an incredibly simple, Pythonic object store based on Amazon's S3 static file storage.
 
-Useful for **prototyping**, **casual hacking**, and (maybe) even low-traffic **server-less backends**!
+It's useful for **prototyping**, **casual hacking**, and (maybe) even low-traffic **server-less backends**!
 
 ## Features
 
@@ -95,15 +95,15 @@ nodb.human_readable_indexes = True
 
 ## TODO (Maybe?)
 
-* **Tests**
-* Different serializers
-* Custom serializers
+* **Tests** with Placebo
+* **Python3** support
 * Local file storage
 * Quering ranges (numberic IDs only), etc.
+* Different serializers
+* Custom serializers
 * Multiple indexes
 * Compression
 * Bucket management
-* Dumps
 
 ## Related Projects
 

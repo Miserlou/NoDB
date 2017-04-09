@@ -109,6 +109,7 @@ class NoDB(object):
         packed['uuid'] = str(uuid.uuid4())
 
         if self.serializer == 'pickle':
+            # TODO: Python3
             packed['obj'] = str(base64.b64encode(pickle.dumps(obj)))
         elif self.serializer == 'json':
             packed['obj'] = obj
@@ -131,6 +132,7 @@ class NoDB(object):
             if self.serializer != 'pickle':
                 raise Exception("Security exception: Won't unpickle if not set to pickle.")
 
+            # TODO: Python3
             return_me['obj'] = pickle.loads(base64.b64decode(deserialized['obj']))
 
         elif deserialized['serializer'] == 'json':
