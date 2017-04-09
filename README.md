@@ -104,6 +104,8 @@ nodb.human_readable_indexes = True
 * Multiple indexes
 * Compression
 * Bucket management
+* Pseudo-locking
+* Performance/load testing
 
 ## Related Projects
 
