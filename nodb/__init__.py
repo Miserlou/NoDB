@@ -47,16 +47,22 @@ class NoDB(object):
         # First, serialize.
         serialized = self._serialize(obj)
 
+        # Next, compute the index
+        real_index = self._get_object_index(obj, self.index)
+
         # Then, store.
         bytesIO = BytesIO()
         bytesIO.write(serialized)
         bytesIO.seek(0)
 
-        real_index = self._get_object_index(obj, self.index)
+
         s3_object = s3.Object(self.bucket, self.prefix + real_index)
         result = s3_object.put('rb', Body=bytesIO)
 
-        return True
+        if result['ResponseMetadata']['HTTPStatusCode'] == 200:
+            return True
+        else:
+            return False
 
     def load(self, index, metainfo=False):
         """
@@ -114,7 +120,7 @@ class NoDB(object):
         elif self.serializer == 'json':
             packed['obj'] = obj
         else:
-            raise Exception("Unsupport serialize format: " + str(self.serializer))
+            raise Exception("Unsupported serialize format: " + str(self.serializer))
 
         return json.dumps(packed)
 
@@ -139,7 +145,7 @@ class NoDB(object):
             return_me['obj'] = deserialized['obj']
 
         else:
-            raise Exception("Unsupport serialize format: " + deserialized['serializer'])
+            raise Exception("Unsupported serialize format: " + deserialized['serializer'])
 
         return_me['dt'] = deserialized['dt']
         return_me['uuid'] = deserialized['uuid']

@@ -56,7 +56,7 @@ After that, you can save and load literally anything you want, whenever you want
 ```python
 # Save an object!
 user = {"Name": "Jeff", "age": 19}
-nodb.save(user)
+nodb.save(user) # True
 
 # Load our object!
 user = nodb.load("Jeff")
