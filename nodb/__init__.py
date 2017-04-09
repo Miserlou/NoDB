@@ -109,7 +109,7 @@ class NoDB(object):
         packed['uuid'] = str(uuid.uuid4())
 
         if self.serializer == 'pickle':
-            packed['obj'] = base64.b64encode(pickle.dumps(obj))
+            packed['obj'] = str(base64.b64encode(pickle.dumps(obj)))
         elif self.serializer == 'json':
             packed['obj'] = obj
         else:
