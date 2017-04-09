@@ -1,12 +1,8 @@
-<p align="center">
-  <img src="http://i.imgur.com/oePnHJn.jpg" alt="NoDB Rocks!"/>
-</p>
-
 # NoDB
 
 [![Build Status](https://travis-ci.org/Miserlou/NoDB.svg)](https://travis-ci.org/Miserlou/NoDB)
 [![Coverage](https://img.shields.io/coveralls/Miserlou/NoDB.svg)](https://coveralls.io/github/Miserlou/NoDB)
-[![PyPI](https://img.shields.io/pypi/v/Zappa.svg)](https://pypi.python.org/pypi/nodb)
+[![PyPI](https://img.shields.io/pypi/v/NoDB.svg)](https://pypi.python.org/pypi/nodb)
 [![Slack](https://img.shields.io/badge/chat-slack-ff69b4.svg)](https://slack.zappa.io/)
 [![Gun.io](https://img.shields.io/badge/made%20by-gun.io-blue.svg)](https://gun.io/)
 [![Patreon](https://img.shields.io/badge/support-patreon-brightgreen.svg)](https://patreon.com/zappa)
@@ -15,7 +11,7 @@ NoDB isn't a database.. but it sort of looks like one.
 
 It's an incredibly simple Pythonic object store based on S3.
 
-Useful for **prototyping**, **casual hacking**, and (maybe) even low-traffic **serverless backends**.
+Useful for **prototyping**, **casual hacking**, and (maybe) even low-traffic **server-less backends**!
 
 ## Features
 
@@ -33,10 +29,10 @@ $ pip install nodb
 
 ## Usage
 
-#### Warning!
-_NoDB is **insecure by **default**, as it uses `cPickle` under the hood. Do not use it for untrusted data without setting `serializer` to `"json"!`_
+### Warning!
+_NoDB is **insecure by default**!_ Do not use it for untrusted data before setting `serializer` to `"json"`!_
 
-NoDB is super easy to use. You make a NoDB object, point it to your bucket and tell it what field you want to index on. After that, you can save and load literally anything you want, whenever you want.
+**NoDB** is super easy to use. You make a NoDB object, point it to your bucket and tell it what field you want to index on. After that, you can save and load literally anything you want, whenever you want.
 
 ```python
 # Set it up
