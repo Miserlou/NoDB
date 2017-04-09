@@ -25,14 +25,16 @@ Useful for **prototyping**, **casual hacking**, and (maybe) even low-traffic **s
 
 ## Installation
 
+**NoDB** can be installed easily via `pip`, like so:
+
 ```
 $ pip install nodb
 ```
 
-## Usage
+## Warning!
+**NoDB** is **insecure by default**! Do not use it for untrusted data before setting `serializer` to `"json"`!
 
-### Warning!
-_NoDB is **insecure by default**! Do not use it for untrusted data before setting `serializer` to `"json"`!_
+## Usage
 
 **NoDB** is super easy to use!
 
@@ -69,7 +71,7 @@ To use a safer, non-Pickle serializer, just set JSON as your serializer:
 
 ```python
 nodb = NoDB()
-nodb.serializer = "json
+nodb.serializer = "json"
 ```
 
 ### Object Metadata
@@ -116,6 +118,6 @@ If you are adding a non-trivial amount of new code, please include a functioning
 
 Please include the GitHub issue or pull request URL that has discussion related to your changes as a comment in the code ([example](https://github.com/Miserlou/Zappa/blob/fae2925431b820eaedf088a632022e4120a29f89/zappa/zappa.py#L241-L243)). This greatly helps for project maintainability, as it allows us to trace back use cases and explain decision making.
 
-## Copyright and License
+## License
 
 (C) Rich Jones 2017, MIT License.
