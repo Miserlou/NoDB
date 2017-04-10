@@ -148,3 +148,8 @@ Please include the GitHub issue or pull request URL that has discussion related 
 ## License
 
 (C) Rich Jones 2017, MIT License.
+
+<br />
+<p align="center">
+  <a href="https://gun.io"><img src="http://i.imgur.com/M7wJipR.png" alt="Made by Gun.io"/></a>
+</p>
