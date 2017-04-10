@@ -97,6 +97,8 @@ nodb = NoDB()
 nodb.serializer = "json"
 ```
 
+Note that for this to work, your object must be JSON-serializable.
+
 ### Object Metadata
 
 You can get metainfo (datetime and UUID) for a given object by passing `metainfo=True` to `load`, like so:
