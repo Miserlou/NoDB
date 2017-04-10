@@ -17,7 +17,7 @@ with open(os.path.join(os.path.dirname(__file__), 'test_requirements.txt')) as f
 
 setup(
     name='nodb',
-    version='0.2.0',
+    version='0.2.1',
     packages=['nodb'],
     install_requires=required,
     tests_require=test_required,

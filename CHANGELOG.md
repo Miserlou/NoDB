@@ -1,3 +1,6 @@
+## 0.2.1
+* Fix class serialization
+
 ## 0.2.0
 * Adds `delete()`
 
