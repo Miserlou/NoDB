@@ -3,6 +3,7 @@ from io import BytesIO
 
 import base64
 import boto3
+import botocore
 import hashlib
 import json
 import uuid
@@ -55,7 +56,6 @@ class NoDB(object):
         bytesIO.write(serialized)
         bytesIO.seek(0)
 
-
         s3_object = s3.Object(self.bucket, self.prefix + real_index)
         result = s3_object.put('rb', Body=bytesIO)
 
@@ -75,11 +75,11 @@ class NoDB(object):
         real_index = self._format_index_value(index)
 
         # Next, get the bytes (if any)
-        serialized_s3 = s3.Object(self.bucket, self.prefix + real_index)
-        serialized = serialized_s3.get()["Body"].read()
-
-        # No record, return None.
-        if not serialized:
+        try:
+            serialized_s3 = s3.Object(self.bucket, self.prefix + real_index)
+            serialized = serialized_s3.get()["Body"].read()
+        except botocore.exceptions.ClientError:
+            # No Key? Return None.
             return None
 
         # Then read the data format
@@ -90,6 +90,24 @@ class NoDB(object):
             return deserialized['obj'], (deserialized['dt'], deserialized['uuid'])
         else:
             return deserialized['obj']
+
+    def delete(self, index):
+        """
+        Given an index, delete this object.
+        """
+
+        # First, calculate the real index
+        real_index = self._format_index_value(index)
+
+        # Next, get the bytes (if any)
+        serialized_s3 = s3.Object(self.bucket, self.prefix + real_index)
+        result = serialized_s3.delete()
+
+        if result['ResponseMetadata']['HTTPStatusCode'] in [200, 204]:
+            return True
+        else:
+            return False
+
 
     ###
     # Private interfaces

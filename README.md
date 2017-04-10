@@ -61,6 +61,9 @@ nodb.save(user) # True
 # Load our object!
 user = nodb.load("Jeff")
 print user.age # 19
+
+# Delete our object
+nodb.delete("Jeff") # True
 ```
 
 By default, you can save and load any Python object.
