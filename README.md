@@ -43,7 +43,6 @@ $ pip install nodb
 You simply make a NoDB object, point it to your bucket and tell it what field you want to index on.
 
 ```python
-# Set it up
 from nodb import NoDB
 
 nodb = NoDB()
