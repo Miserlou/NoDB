@@ -21,9 +21,9 @@ It's useful for **prototyping**, **casual hacking**, and (maybe) even low-traffi
 * Server-less!
 * Uses S3 as a datastore.
 * Loads to native Python objects with `cPickle`
-* Alternately use JSON as a storage format for untrusted data
-* Cheap!
-* Fast(ish)
+* Can use JSON as a serialization format for untrusted data
+* Cheap(ish)!
+* Fast(ish)! (Especially from Lambda)
 
 ## Installation
 

@@ -1,3 +1,6 @@
+## 0.2.0
+* Adds `delete()`
+
 ## 0.1.1
 * Python3 was broken.
 
