@@ -47,14 +47,14 @@ from nodb import NoDB
 
 nodb = NoDB()
 nodb.bucket = "my-s3-bucket"
-nodb.index = "Name"
+nodb.index = "name"
 ```
 
 After that, you can save and load literally anything you want, whenever you want!
 
 ```python
 # Save an object!
-user = {"Name": "Jeff", "age": 19}
+user = {"name": "Jeff", "age": 19}
 nodb.save(user) # True
 
 # Load our object!
@@ -66,6 +66,25 @@ nodb.delete("Jeff") # True
 ```
 
 By default, you can save and load any Python object.
+
+Here's the same example, but with a class. Note the import and configuration is the same!
+
+```python
+class User(object):
+    name = None
+    age = None
+
+    def print_name(self):
+        print "Hi, I'm " + self.name + "!"
+
+new_user = User()
+new_user.name = "Jeff"
+new_user.age = 19
+nodb.save(new_user) # True
+
+jeff = nodb.load("Jeff")
+jeff.print_name() # Hi, I'm Jeff!
+```
 
 ## Advanced Usage
 

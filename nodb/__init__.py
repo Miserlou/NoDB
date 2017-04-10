@@ -187,7 +187,7 @@ class NoDB(object):
                 raise Exception("Dict object has no key: " + str(index))
         else:
             if hasattr(obj, index):
-                index_value = obj.index
+                index_value = getattr(obj, index)
             else:
                 raise Exception("Dict object has no attribute: " + str(index))
 
