@@ -40,16 +40,21 @@ class NoDB(object):
     # Public Interfaces
     ##
 
-    def save(self, obj):
+    def save(self, obj, index=None):
         """
         Save an object to the backend datastore.
+
+        Will use this NoDB's index by default if an explicit index isn't supplied.
         """
 
         # First, serialize.
         serialized = self._serialize(obj)
 
         # Next, compute the index
-        real_index = self._get_object_index(obj, self.index)
+        if not index:
+            real_index = self._get_object_index(obj, self.index)
+        else:
+            real_index = self._format_index_value(index)
 
         # Then, store.
         bytesIO = BytesIO()
