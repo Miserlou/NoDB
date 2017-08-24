@@ -13,8 +13,6 @@ try:
 except Exception:
     import pickle
 
-s3 = boto3.resource('s3')
-
 class NoDB(object):
     """
     A NoDB connection object.
@@ -29,6 +27,9 @@ class NoDB(object):
     serializer = "pickle"
     index = "id"
     prefix = ".nodb/"
+    signature_version = "s3v4"
+
+    s3 = boto3.resource('s3', config=botocore.client.Config(signature_version=signature_version))
 
     ##
     # Advanced config
@@ -61,7 +62,7 @@ class NoDB(object):
         bytesIO.write(serialized)
         bytesIO.seek(0)
 
-        s3_object = s3.Object(self.bucket, self.prefix + real_index)
+        s3_object = self.s3.Object(self.bucket, self.prefix + real_index)
         result = s3_object.put('rb', Body=bytesIO)
 
         if result['ResponseMetadata']['HTTPStatusCode'] == 200:
@@ -81,7 +82,7 @@ class NoDB(object):
 
         # Next, get the bytes (if any)
         try:
-            serialized_s3 = s3.Object(self.bucket, self.prefix + real_index)
+            serialized_s3 = self.s3.Object(self.bucket, self.prefix + real_index)
             serialized = serialized_s3.get()["Body"].read()
         except botocore.exceptions.ClientError:
             # No Key? Return None.
@@ -105,7 +106,7 @@ class NoDB(object):
         real_index = self._format_index_value(index)
 
         # Next, get the bytes (if any)
-        serialized_s3 = s3.Object(self.bucket, self.prefix + real_index)
+        serialized_s3 = self.s3.Object(self.bucket, self.prefix + real_index)
         result = serialized_s3.delete()
 
         if result['ResponseMetadata']['HTTPStatusCode'] in [200, 204]:
