@@ -1,12 +1,12 @@
 from datetime import datetime
 from io import BytesIO
 
-import base64
 import boto3
 import botocore
 import hashlib
 import json
 import uuid
+import six
 
 try:
     import cPickle as pickle
@@ -137,44 +137,30 @@ class NoDB(object):
         packed['serializer'] = self.serializer
         packed['dt'] = str(datetime.utcnow())
         packed['uuid'] = str(uuid.uuid4())
+        packed['obj'] = obj
 
         if self.serializer == 'pickle':
-            # TODO: Python3
-            packed['obj'] = str(base64.b64encode(pickle.dumps(obj)))
+            serialized = pickle.dumps(packed)
         elif self.serializer == 'json':
-            packed['obj'] = obj
+            serialized = json.dumps(packed).encode('utf-8')
         else:
             raise Exception("Unsupported serialize format: " + str(self.serializer))
 
-        return json.dumps(packed)
+        return six.binary_type(serialized)
 
     def _deserialize(self, serialized):
         """
         Unpack and load data from a serialized NoDB entry.
         """
-
-        obj = None
-        deserialized = json.loads(serialized)
-        return_me = {}
-
-        if deserialized['serializer'] == 'pickle':
-
-            if self.serializer != 'pickle':
-                raise Exception("Security exception: Won't unpickle if not set to pickle.")
-
-            # TODO: Python3
-            return_me['obj'] = pickle.loads(base64.b64decode(deserialized['obj']))
-
-        elif deserialized['serializer'] == 'json':
-            return_me['obj'] = deserialized['obj']
-
+        if self.serializer == 'pickle':
+            deserialized = pickle.loads(serialized)
+        elif self.serializer == 'json':
+            deserialized = json.loads(serialized.decode('utf-8'))
         else:
-            raise Exception("Unsupported serialize format: " + deserialized['serializer'])
+            raise Exception("Unsupported serializer format set on initialization")
 
-        return_me['dt'] = deserialized['dt']
-        return_me['uuid'] = deserialized['uuid']
+        return deserialized
 
-        return return_me
 
     def _get_object_index(self, obj, index):
         """
@@ -185,9 +171,8 @@ class NoDB(object):
         If it doesn't have an attribute, or has an illegal attribute, fail.
         """
 
-        index_value = None
         if type(obj) is dict:
-            if obj.has_key(index):
+            if index in obj:
                 index_value = obj[index]
             else:
                 raise Exception("Dict object has no key: " + str(index))
@@ -208,4 +193,4 @@ class NoDB(object):
             # You are on your own here! This may not work!
             return index_value
         else:
-            return self.hash_function(bytes(index_value)).hexdigest()
+            return self.hash_function(six.binary_type(index_value.encode('utf-8'))).hexdigest()
