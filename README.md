@@ -25,6 +25,10 @@ It's useful for **prototyping**, **casual hacking**, and (maybe) even low-traffi
 * Cheap(ish)!
 * Fast(ish)! (Especially from Lambda)
 
+## Performance
+
+Initial load test with [Goad](https://goad.io/) of 10,000 requests (500 concurrent) with a write and subsequent read of the same index showed an average time of 400ms. This should be more than acceptable for many applications, even those which don't have sparse data, although that is preferred.
+
 ## Installation
 
 **NoDB** can be installed easily via `pip`, like so:
