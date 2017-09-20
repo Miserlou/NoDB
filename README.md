@@ -22,6 +22,7 @@ It's useful for **prototyping**, **casual hacking**, and (maybe) even low-traffi
 * Uses S3 as a datastore.
 * Loads to native Python objects with `cPickle`
 * Can use JSON as a serialization format for untrusted data
+* Local filestore based cacheing
 * Cheap(ish)!
 * Fast(ish)! (Especially from Lambda)
 
@@ -118,6 +119,14 @@ By default, the indexes are hashed. If you want to be able to debug through the 
 
 ```python
 nodb.human_readable_indexes = True
+```
+
+#### Caching
+
+You can enable local file caching, which will store previously retrieved values in the local rather than remote filestore.
+
+```python
+nodb.cache = True
 ```
 
 ## TODO (Maybe?)

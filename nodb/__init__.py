@@ -6,6 +6,8 @@ import boto3
 import botocore
 import hashlib
 import json
+import os
+import tempfile
 import uuid
 
 try:
@@ -28,6 +30,7 @@ class NoDB(object):
     index = "id"
     prefix = ".nodb/"
     signature_version = "s3v4"
+    cache = False
 
     s3 = boto3.resource('s3', config=botocore.client.Config(signature_version=signature_version))
 
@@ -80,13 +83,38 @@ class NoDB(object):
         # First, calculate the real index
         real_index = self._format_index_value(index)
 
+        # If cache enabled, check local filestore for bytes
+        cache_hit = False
+        if self.cache:
+            base_cache_path = os.path.join(tempfile.gettempdir(), '.nodb')
+            if not os.path.isdir(base_cache_path):
+                os.makedirs(base_cache_path)
+            cache_path = os.path.join(base_cache_path, real_index)
+            # Cache hit!
+            if os.path.isfile(cache_path):
+                with open(cache_path, "rb") as in_file:
+                    serialized = in_file.read()
+                cache_hit = True
+            else:
+                cache_hit = False
+
         # Next, get the bytes (if any)
-        try:
-            serialized_s3 = self.s3.Object(self.bucket, self.prefix + real_index)
-            serialized = serialized_s3.get()["Body"].read()
-        except botocore.exceptions.ClientError:
-            # No Key? Return None.
-            return None
+        if not self.cache or not cache_hit:
+            try:
+                serialized_s3 = self.s3.Object(self.bucket, self.prefix + real_index)
+                serialized = serialized_s3.get()["Body"].read()
+            except botocore.exceptions.ClientError:
+                # No Key? Return None.
+                return None
+
+            # Store the cache result
+            if self.cache:
+
+                if not os.path.exists(cache_path):
+                    open(cache_path, 'w+').close()
+
+                with open(cache_path, "wb") as in_file:
+                    in_file.write(serialized)
 
         # Then read the data format
         deserialized = self._deserialize(serialized)

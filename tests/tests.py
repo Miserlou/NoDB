@@ -8,10 +8,10 @@ import random
 import string
 import zipfile
 import re
-import unittest
 import shutil
 import sys
 import tempfile
+import unittest
 
 from nodb import NoDB
 
@@ -59,6 +59,30 @@ class TestNoDB(unittest.TestCase):
         nodb.human_readable_indexes = True
         serialized = nodb._serialize(jeff)
         nodb._deserialize(serialized)
+
+    def test_nodb_cache(self):
+        self.assertTrue(True)
+        nodb = NoDB()
+        nodb.index = "Name"
+        nodb.cache = True
+
+        jeff = {"Name": "Jeff", "age": 19}
+        serialized = nodb._serialize(jeff)
+
+        real_index = nodb._format_index_value("Jeff")
+        base_cache_path = os.path.join(tempfile.gettempdir(), '.nodb')
+        if not os.path.isdir(base_cache_path):
+            os.makedirs(base_cache_path)
+
+        cache_path = os.path.join(base_cache_path, real_index)
+        if not os.path.exists(cache_path):
+            f = open(cache_path, 'a')
+            f.close()
+
+        with open(cache_path, "wb") as in_file:
+            in_file.write(serialized)
+
+        nodb.load("Jeff")
 
 if __name__ == '__main__':
     unittest.main()
