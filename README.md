@@ -93,7 +93,7 @@ jeff.print_name() # Hi, I'm Jeff!
 
 ## Advanced Usage
 
-#### Different Serializers
+### Different Serializers
 
 To use a safer, non-Pickle serializer, just set JSON as your serializer:
 
@@ -113,7 +113,7 @@ You can get metainfo (datetime and UUID) for a given object by passing `metainfo
 user, datetime, uuid = nodb.load("Jeff", metainfo=True)
 ```
 
-#### Human Readable Indexes
+### Human Readable Indexes
 
 By default, the indexes are hashed. If you want to be able to debug through the AWS console, set `human_readable_indexes` to True:
 
@@ -121,7 +121,7 @@ By default, the indexes are hashed. If you want to be able to debug through the 
 nodb.human_readable_indexes = True
 ```
 
-#### Caching
+### Caching
 
 You can enable local file caching, which will store previously retrieved values in the local rather than remote filestore.
 
