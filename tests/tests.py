@@ -83,6 +83,12 @@ class TestNoDB(unittest.TestCase):
             in_file.write(serialized)
 
         nodb.load("Jeff")
+        loaded = nodb.load("Jeff", default={})
+        self.assertEqual(loaded, jeff)
+        loaded = nodb.load("Jeff", default="Booty")
+        self.assertEqual(loaded, jeff)
+
+        bcp = nodb._get_base_cache_path()
 
 if __name__ == '__main__':
     unittest.main()

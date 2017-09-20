@@ -113,6 +113,12 @@ You can get metainfo (datetime and UUID) for a given object by passing `metainfo
 user, datetime, uuid = nodb.load("Jeff", metainfo=True)
 ```
 
+You can also pass in a `default` argument for non-existent values.
+
+```python
+user = nodb.load("Jeff", default={}) # {}
+```
+
 ### Human Readable Indexes
 
 By default, the indexes are hashed. If you want to be able to debug through the AWS console, set `human_readable_indexes` to True:

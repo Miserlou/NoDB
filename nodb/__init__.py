@@ -85,7 +85,7 @@ class NoDB(object):
 
         return resp
 
-    def load(self, index, metainfo=False):
+    def load(self, index, metainfo=False, default=None):
         """
         Load an object from the backend datastore.
 
@@ -114,8 +114,8 @@ class NoDB(object):
                 serialized_s3 = self.s3.Object(self.bucket, self.prefix + real_index)
                 serialized = serialized_s3.get()["Body"].read()
             except botocore.exceptions.ClientError:
-                # No Key? Return None.
-                return None
+                # No Key? Return default.
+                return default
 
             # Store the cache result
             if self.cache:
