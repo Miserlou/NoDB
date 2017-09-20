@@ -37,6 +37,7 @@ class NoDB(object):
     ##
     # Advanced config
     ##
+    cache_dir = tempfile.gettempdir()
     human_readable_indexes = False
     hash_function = hashlib.sha256
 
@@ -131,7 +132,10 @@ class NoDB(object):
 
         # And return the data
         if metainfo:
-            return deserialized['obj'], (deserialized['dt'], deserialized['uuid'])
+            return deserialized['obj'], (
+                                            deserialized['dt'],
+                                            deserialized['uuid']
+                                        )
         else:
             return deserialized['obj']
 
@@ -253,7 +257,7 @@ class NoDB(object):
         Make sure that the cache directory is real. Returns the path.
         """
 
-        base_cache_path = os.path.join(tempfile.gettempdir(), '.nodb')
+        base_cache_path = os.path.join(self.cache_dir, '.nodb')
         if not os.path.isdir(base_cache_path):
             os.makedirs(base_cache_path)
         return base_cache_path
