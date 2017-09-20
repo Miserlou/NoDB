@@ -69,9 +69,21 @@ class NoDB(object):
         result = s3_object.put('rb', Body=bytesIO)
 
         if result['ResponseMetadata']['HTTPStatusCode'] == 200:
-            return True
+            resp = True
         else:
-            return False
+            resp = False
+
+        # If cache enabled, write this value to cache.
+        if resp and self.cache:
+
+            base_cache_path = self._get_base_cache_path()
+            cache_path = os.path.join(base_cache_path, real_index)
+            if not os.path.exists(cache_path):
+                open(cache_path, 'w+').close()
+            with open(cache_path, "wb") as in_file:
+                in_file.write(serialized)
+
+        return resp
 
     def load(self, index, metainfo=False):
         """
@@ -86,9 +98,7 @@ class NoDB(object):
         # If cache enabled, check local filestore for bytes
         cache_hit = False
         if self.cache:
-            base_cache_path = os.path.join(tempfile.gettempdir(), '.nodb')
-            if not os.path.isdir(base_cache_path):
-                os.makedirs(base_cache_path)
+            base_cache_path = self._get_base_cache_path()
             cache_path = os.path.join(base_cache_path, real_index)
             # Cache hit!
             if os.path.isfile(cache_path):
@@ -237,3 +247,14 @@ class NoDB(object):
             return index_value
         else:
             return self.hash_function(bytes(index_value)).hexdigest()
+
+    def _get_base_cache_path(self):
+        """
+        Make sure that the cache directory is real. Returns the path.
+        """
+
+        base_cache_path = os.path.join(tempfile.gettempdir(), '.nodb')
+        if not os.path.isdir(base_cache_path):
+            os.makedirs(base_cache_path)
+        return base_cache_path
+
