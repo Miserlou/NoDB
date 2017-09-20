@@ -22,7 +22,7 @@ It's useful for **prototyping**, **casual hacking**, and (maybe) even low-traffi
 * Uses S3 as a datastore.
 * Loads to native Python objects with `cPickle`
 * Can use JSON as a serialization format for untrusted data
-* Local filestore based cacheing
+* Local filestore based caching
 * Cheap(ish)!
 * Fast(ish)! (Especially from Lambda)
 
