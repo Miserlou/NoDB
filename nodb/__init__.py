@@ -23,6 +23,7 @@ class NoDB(object):
     ##
     # Config
     ##
+
     bucket = None
     backend = "s3"
     region = "us-east-1"
@@ -37,6 +38,7 @@ class NoDB(object):
     ##
     # Advanced config
     ##
+
     cache_dir = tempfile.gettempdir()
     human_readable_indexes = False
     hash_function = hashlib.sha256
