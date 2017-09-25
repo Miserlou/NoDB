@@ -1,3 +1,9 @@
+## 0.3.1
+* Add `default` to `load`
+
+## 0.3.0
+* Add cache ability
+
 ## 0.2.1
 * Fix class serialization
 

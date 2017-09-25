@@ -22,8 +22,13 @@ It's useful for **prototyping**, **casual hacking**, and (maybe) even low-traffi
 * Uses S3 as a datastore.
 * Loads to native Python objects with `cPickle`
 * Can use JSON as a serialization format for untrusted data
+* Local filestore based caching
 * Cheap(ish)!
 * Fast(ish)! (Especially from Lambda)
+
+## Performance
+
+Initial load test with [Goad](https://goad.io/) of 10,000 requests (500 concurrent) with a write and subsequent read of the same index showed an average time of 400ms. This should be more than acceptable for many applications, even those which don't have sparse data, although that is preferred.
 
 ## Installation
 
@@ -88,7 +93,7 @@ jeff.print_name() # Hi, I'm Jeff!
 
 ## Advanced Usage
 
-#### Different Serializers
+### Different Serializers
 
 To use a safer, non-Pickle serializer, just set JSON as your serializer:
 
@@ -108,12 +113,26 @@ You can get metainfo (datetime and UUID) for a given object by passing `metainfo
 user, datetime, uuid = nodb.load("Jeff", metainfo=True)
 ```
 
-#### Human Readable Indexes
+You can also pass in a `default` argument for non-existent values.
+
+```python
+user = nodb.load("Jeff", default={}) # {}
+```
+
+### Human Readable Indexes
 
 By default, the indexes are hashed. If you want to be able to debug through the AWS console, set `human_readable_indexes` to True:
 
 ```python
 nodb.human_readable_indexes = True
+```
+
+### Caching
+
+You can enable local file caching, which will store previously retrieved values in the local rather than remote filestore.
+
+```python
+nodb.cache = True
 ```
 
 ## TODO (Maybe?)
