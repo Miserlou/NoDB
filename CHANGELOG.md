@@ -1,3 +1,6 @@
+## 0.3.2
+* Start to add logger calls
+
 ## 0.3.1
 * Add `default` to `load`
 

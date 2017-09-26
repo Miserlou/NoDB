@@ -6,6 +6,7 @@ import boto3
 import botocore
 import hashlib
 import json
+import logging
 import os
 import tempfile
 import uuid
@@ -70,6 +71,7 @@ class NoDB(object):
 
         s3_object = self.s3.Object(self.bucket, self.prefix + real_index)
         result = s3_object.put('rb', Body=bytesIO)
+        logging.debug("Put remote bytes: " + self.prefix + real_index)
 
         if result['ResponseMetadata']['HTTPStatusCode'] == 200:
             resp = True
@@ -85,6 +87,7 @@ class NoDB(object):
                 open(cache_path, 'w+').close()
             with open(cache_path, "wb") as in_file:
                 in_file.write(serialized)
+            logging.debug("Wrote to cache file: " + cache_path)
 
         return resp
 
@@ -108,6 +111,7 @@ class NoDB(object):
                 with open(cache_path, "rb") as in_file:
                     serialized = in_file.read()
                 cache_hit = True
+                logging.debug("Loaded bytes from cache file: " + cache_path)
             else:
                 cache_hit = False
 
@@ -116,8 +120,9 @@ class NoDB(object):
             try:
                 serialized_s3 = self.s3.Object(self.bucket, self.prefix + real_index)
                 serialized = serialized_s3.get()["Body"].read()
-            except botocore.exceptions.ClientError:
+            except botocore.exceptions.ClientError as e:
                 # No Key? Return default.
+                logging.debug("No remote object, returning default.")
                 return default
 
             # Store the cache result
@@ -128,6 +133,8 @@ class NoDB(object):
 
                 with open(cache_path, "wb") as in_file:
                     in_file.write(serialized)
+
+                logging.debug("Wrote to cache file: " + cache_path)
 
         # Then read the data format
         deserialized = self._deserialize(serialized)
@@ -248,6 +255,8 @@ class NoDB(object):
         Hash these bytes, or don't.
         """
 
+        logging.debug("Formatting index value: " + str(index_value))
+
         if self.human_readable_indexes:
             # You are on your own here! This may not work!
             return index_value
@@ -263,4 +272,3 @@ class NoDB(object):
         if not os.path.isdir(base_cache_path):
             os.makedirs(base_cache_path)
         return base_cache_path
-
