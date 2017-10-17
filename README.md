@@ -153,6 +153,7 @@ nodb.cache = True
 
 * [Zappa](https://github.com/Miserlou/Zappa) - Python's server-less framework!
 * [K.E.V.](https://github.com/capless/kev) - a Python ORM for key-value stores based on Redis, S3, and a S3/Redis hybrid backend.
+* [s3sqlite](https://github.com/Miserlou/zappa-django-utils#using-an-s3-backed-database-engine) - An S3-backed database engine for Django
 
 ## Contributing
 
@@ -163,10 +164,6 @@ Please file tickets for discussion before submitting patches. Pull requests shou
 If you are adding a non-trivial amount of new code, please include a functioning test in your PR. For AWS calls, we use the `placebo` library, which you can learn to use [in their README](https://github.com/garnaat/placebo#usage-as-a-decorator). The test suite will be run by [Travis CI](https://travis-ci.org/Miserlou/NoDB) once you open a pull request.
 
 Please include the GitHub issue or pull request URL that has discussion related to your changes as a comment in the code ([example](https://github.com/Miserlou/Zappa/blob/fae2925431b820eaedf088a632022e4120a29f89/zappa/zappa.py#L241-L243)). This greatly helps for project maintainability, as it allows us to trace back use cases and explain decision making.
-
-## See Also:
-
-* [s3sqlite](https://github.com/Miserlou/zappa-django-utils#using-an-s3-backed-database-engine) - An S3-backed database engine for Django
 
 ## License
 
