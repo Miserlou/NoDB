@@ -164,6 +164,10 @@ If you are adding a non-trivial amount of new code, please include a functioning
 
 Please include the GitHub issue or pull request URL that has discussion related to your changes as a comment in the code ([example](https://github.com/Miserlou/Zappa/blob/fae2925431b820eaedf088a632022e4120a29f89/zappa/zappa.py#L241-L243)). This greatly helps for project maintainability, as it allows us to trace back use cases and explain decision making.
 
+## See Also:
+
+* [s3sqlite](https://github.com/Miserlou/zappa-django-utils#using-an-s3-backed-database-engine) - An S3-backed database engine for Django
+
 ## License
 
 (C) Rich Jones 2017, MIT License.
