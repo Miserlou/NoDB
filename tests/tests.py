@@ -80,7 +80,7 @@ class TestNoDB(unittest.TestCase):
             f.close()
 
         with open(cache_path, "wb") as in_file:
-            in_file.write(serialized)
+            in_file.write(serialized.encode(NoDB.encoding))
 
         nodb.load("Jeff")
         loaded = nodb.load("Jeff", default={})
