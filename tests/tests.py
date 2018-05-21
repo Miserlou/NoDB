@@ -90,5 +90,12 @@ class TestNoDB(unittest.TestCase):
 
         bcp = nodb._get_base_cache_path()
 
+    def test_s3_resource(self):
+        self.assertTrue(True)
+        nodb = NoDB()
+        nodb.aws_s3_host = 'http://fakes3'
+        self.assertTrue('s3.ServiceResource' in str(type(nodb.s3)))
+
+
 if __name__ == '__main__':
     unittest.main()

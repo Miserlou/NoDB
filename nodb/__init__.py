@@ -33,8 +33,7 @@ class NoDB(object):
     prefix = ".nodb/"
     signature_version = "s3v4"
     cache = False
-
-    s3 = boto3.resource('s3', config=botocore.client.Config(signature_version=signature_version))
+    aws_s3_host = None
 
     ##
     # Advanced config
@@ -47,6 +46,14 @@ class NoDB(object):
     ##
     # Public Interfaces
     ##
+    @property
+    def s3(self):
+        s3 = boto3.resource(
+            's3',
+            config=botocore.client.Config(signature_version=self.signature_version),
+            endpoint_url=self.aws_s3_host
+        )
+        return s3
 
     def save(self, obj, index=None):
         """
