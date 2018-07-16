@@ -64,7 +64,7 @@ nodb.save(user) # True
 
 # Load our object!
 user = nodb.load("Jeff")
-print user['age'] # 19
+print(user['age']) # 19
 
 # Delete our object
 nodb.delete("Jeff") # True
@@ -80,7 +80,7 @@ class User(object):
     age = None
 
     def print_name(self):
-        print "Hi, I'm " + self.name + "!"
+        print("Hi, I'm " + self.name + "!")
 
 new_user = User()
 new_user.name = "Jeff"
