@@ -155,7 +155,6 @@ nodb = NoDB(session=session)
 ## TODO (Maybe?)
 
 * **Tests** with Placebo
-* **Python3** support
 * Local file storage
 * Quering ranges (numberic IDs only), etc.
 * Different serializers

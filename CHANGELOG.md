@@ -1,3 +1,6 @@
+## 0.4.0
+* Python3 support added
+
 ## 0.3.2
 * Start to add logger calls
 
