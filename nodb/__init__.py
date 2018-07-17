@@ -34,8 +34,17 @@ class NoDB(object):
     signature_version = "s3v4"
     cache = False
     encoding = 'utf8'
+    profile_name = None
 
     s3 = boto3.resource('s3', config=botocore.client.Config(signature_version=signature_version))
+
+    def __init__(self, profile_name=None, session=None):
+        if profile_name:
+            self.profile_name = profile_name
+        if self.profile_name:
+            session = boto3.session.Session(profile_name=self.profile_name)
+        if session:
+            self.s3 = session.resource('s3', config=botocore.client.Config(signature_version=self.signature_version))
 
     ##
     # Advanced config

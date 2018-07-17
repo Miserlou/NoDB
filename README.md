@@ -135,6 +135,23 @@ You can enable local file caching, which will store previously retrieved values 
 nodb.cache = True
 ```
 
+### AWS settings override
+
+You can override your AWS Profile information or boto3 session by passing either as a initial keyword argument.
+
+```python
+nodb = NoDB(profile_name='my_aws_development_profile')
+# or supply the session
+session = boto3.Session(
+    aws_access_key_id=ACCESS_KEY,
+    aws_secret_access_key=SECRET_KEY,
+    aws_session_token=SESSION_TOKEN,
+)
+nodb = NoDB(session=session)
+```
+
+
+
 ## TODO (Maybe?)
 
 * **Tests** with Placebo
