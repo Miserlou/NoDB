@@ -64,7 +64,7 @@ nodb.save(user) # True
 
 # Load our object!
 user = nodb.load("Jeff")
-print user['age'] # 19
+print(user['age']) # 19
 
 # Delete our object
 nodb.delete("Jeff") # True
@@ -80,7 +80,7 @@ class User(object):
     age = None
 
     def print_name(self):
-        print "Hi, I'm " + self.name + "!"
+        print("Hi, I'm " + self.name + "!")
 
 new_user = User()
 new_user.name = "Jeff"
@@ -134,6 +134,23 @@ You can enable local file caching, which will store previously retrieved values 
 ```python
 nodb.cache = True
 ```
+
+### AWS settings override
+
+You can override your AWS Profile information or boto3 session by passing either as a initial keyword argument.
+
+```python
+nodb = NoDB(profile_name='my_aws_development_profile')
+# or supply the session
+session = boto3.Session(
+    aws_access_key_id=ACCESS_KEY,
+    aws_secret_access_key=SECRET_KEY,
+    aws_session_token=SESSION_TOKEN,
+)
+nodb = NoDB(session=session)
+```
+
+
 
 ## TODO (Maybe?)
 

@@ -33,8 +33,18 @@ class NoDB(object):
     prefix = ".nodb/"
     signature_version = "s3v4"
     cache = False
+    encoding = 'utf8'
+    profile_name = None
 
     s3 = boto3.resource('s3', config=botocore.client.Config(signature_version=signature_version))
+
+    def __init__(self, profile_name=None, session=None):
+        if profile_name:
+            self.profile_name = profile_name
+        if self.profile_name:
+            session = boto3.session.Session(profile_name=self.profile_name)
+        if session:
+            self.s3 = session.resource('s3', config=botocore.client.Config(signature_version=self.signature_version))
 
     ##
     # Advanced config
@@ -66,7 +76,7 @@ class NoDB(object):
 
         # Then, store.
         bytesIO = BytesIO()
-        bytesIO.write(serialized)
+        bytesIO.write(serialized.encode(self.encoding))
         bytesIO.seek(0)
 
         s3_object = self.s3.Object(self.bucket, self.prefix + real_index)
@@ -86,7 +96,7 @@ class NoDB(object):
             if not os.path.exists(cache_path):
                 open(cache_path, 'w+').close()
             with open(cache_path, "wb") as in_file:
-                in_file.write(serialized)
+                in_file.write(serialized.encode(self.encoding))
             logging.debug("Wrote to cache file: " + cache_path)
 
         return resp
@@ -132,7 +142,7 @@ class NoDB(object):
                     open(cache_path, 'w+').close()
 
                 with open(cache_path, "wb") as in_file:
-                    in_file.write(serialized)
+                    in_file.write(serialized.encode(self.encoding))
 
                 logging.debug("Wrote to cache file: " + cache_path)
 
@@ -190,8 +200,7 @@ class NoDB(object):
         packed['uuid'] = str(uuid.uuid4())
 
         if self.serializer == 'pickle':
-            # TODO: Python3
-            packed['obj'] = str(base64.b64encode(pickle.dumps(obj)))
+            packed['obj'] = base64.b64encode(pickle.dumps(obj)).decode(self.encoding)
         elif self.serializer == 'json':
             packed['obj'] = obj
         else:
@@ -213,8 +222,7 @@ class NoDB(object):
             if self.serializer != 'pickle':
                 raise Exception("Security exception: Won't unpickle if not set to pickle.")
 
-            # TODO: Python3
-            return_me['obj'] = pickle.loads(base64.b64decode(deserialized['obj']))
+            return_me['obj'] = pickle.loads(base64.b64decode(deserialized['obj'].encode(self.encoding)))
 
         elif deserialized['serializer'] == 'json':
             return_me['obj'] = deserialized['obj']
@@ -238,7 +246,7 @@ class NoDB(object):
 
         index_value = None
         if type(obj) is dict:
-            if obj.has_key(index):
+            if index in obj:
                 index_value = obj[index]
             else:
                 raise Exception("Dict object has no key: " + str(index))
@@ -261,7 +269,7 @@ class NoDB(object):
             # You are on your own here! This may not work!
             return index_value
         else:
-            return self.hash_function(bytes(index_value)).hexdigest()
+            return self.hash_function(index_value.encode(self.encoding)).hexdigest()
 
     def _get_base_cache_path(self):
         """
