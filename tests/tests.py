@@ -1,15 +1,8 @@
 # -*- coding: utf8 -*-
-import base64
-import collections
-import json
 
 import os
 import random
 import string
-import zipfile
-import re
-import shutil
-import sys
 import tempfile
 import unittest
 
@@ -18,8 +11,10 @@ import moto
 
 from nodb import NoDB
 
+
 def random_string(length):
     return ''.join(random.choice(string.printable) for _ in range(length))
+
 
 class TestNoDB(unittest.TestCase):
     # def setUp(self):
@@ -39,6 +34,10 @@ class TestNoDB(unittest.TestCase):
     #         # Give the user their AWS region back, we're done testing with us-east-1.
     #         os.environ['AWS_DEFAULT_REGION'] = self.users_current_region_name
 
+    def setUp(self):
+        # patch s3 resource with resource with dummy credentials
+        NoDB.s3 = boto3.resource('s3', aws_access_key_id='AKIAIO5FODNN7EXAMPLE',
+                                 aws_secret_access_key='ABCDEF+c2L7yXeGvUyrPgYsDnWRRC1AYEXAMPLE')
     ##
     # Sanity Tests
     ##
@@ -49,23 +48,24 @@ class TestNoDB(unittest.TestCase):
     # Basic Tests
     ##
 
-    def test_nodb(self):
-        self.assertTrue(True)
+    @moto.mock_s3()
+    def test_nodb_serialize_desirialize(self):
         nodb = NoDB('dummy')
         nodb.index = "Name"
 
         jeff = {"Name": "Jeff", "age": 19}
         serialized = nodb._serialize(jeff)
-        nodb._deserialize(serialized)
+        deserialized = nodb._deserialize(serialized)
+        self.assertDictEqual(jeff, deserialized['obj'])
 
         nodb.serializer = 'json'
         nodb.human_readable_indexes = True
         serialized = nodb._serialize(jeff)
-        nodb._deserialize(serialized)
+        deserialized = nodb._deserialize(serialized)
+        self.assertDictEqual(jeff, deserialized['obj'])
 
     @moto.mock_s3
     def test_nodb_save_load(self):
-        self.assertTrue(True)
         # create dummy bucket and store some objects
         bucket_name = 'dummy_bucket'
         boto3.resource('s3').Bucket(bucket_name).create()
@@ -79,8 +79,8 @@ class TestNoDB(unittest.TestCase):
         possible_jeff = nodb.load('Jeff')
         self.assertEqual(possible_jeff, jeff)
 
+    @moto.mock_s3()
     def test_nodb_cache(self):
-        self.assertTrue(True)
         nodb = NoDB('dummy')
         nodb.index = "Name"
         nodb.cache = True
@@ -112,8 +112,9 @@ class TestNoDB(unittest.TestCase):
     @moto.mock_s3()
     def test_nodb_all(self):
         # create dummy bucket and store some objects
-        bucket_name = 'dummy_bucket'
-        boto3.resource('s3').Bucket(bucket_name).create()
+        bucket_name = 'dummy_bucket_12345_qwerty'
+
+        ret = boto3.resource('s3').Bucket(bucket_name).create()
 
         nodb = NoDB(bucket_name)
         nodb.index = "Name"
