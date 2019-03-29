@@ -34,10 +34,10 @@ class TestNoDB(unittest.TestCase):
     #         # Give the user their AWS region back, we're done testing with us-east-1.
     #         os.environ['AWS_DEFAULT_REGION'] = self.users_current_region_name
 
-    def setUp(self):
-        # patch s3 resource with resource with dummy credentials
-        NoDB.s3 = boto3.resource('s3', aws_access_key_id='AKIAIO5FODNN7EXAMPLE',
-                                 aws_secret_access_key='ABCDEF+c2L7yXeGvUyrPgYsDnWRRC1AYEXAMPLE')
+    # def setUp(self):
+    #     # patch s3 resource with resource with dummy credentials
+    #     NoDB.s3 = boto3.resource('s3')
+
     ##
     # Sanity Tests
     ##
@@ -48,8 +48,8 @@ class TestNoDB(unittest.TestCase):
     # Basic Tests
     ##
 
-    @moto.mock_s3()
-    def test_nodb_serialize_desirialize(self):
+    @moto.mock_s3
+    def test_nodb_serialize_deserialize(self):
         nodb = NoDB('dummy')
         nodb.index = "Name"
 
@@ -68,7 +68,8 @@ class TestNoDB(unittest.TestCase):
     def test_nodb_save_load(self):
         # create dummy bucket and store some objects
         bucket_name = 'dummy_bucket'
-        boto3.resource('s3').Bucket(bucket_name).create()
+
+        self._create_mock_bucket(bucket_name)
 
         nodb = NoDB(bucket_name)
         nodb.index = "Name"
@@ -79,7 +80,7 @@ class TestNoDB(unittest.TestCase):
         possible_jeff = nodb.load('Jeff')
         self.assertEqual(possible_jeff, jeff)
 
-    @moto.mock_s3()
+    @moto.mock_s3
     def test_nodb_cache(self):
         nodb = NoDB('dummy')
         nodb.index = "Name"
@@ -109,12 +110,11 @@ class TestNoDB(unittest.TestCase):
 
         bcp = nodb._get_base_cache_path()
 
-    @moto.mock_s3()
+    @moto.mock_s3
     def test_nodb_all(self):
         # create dummy bucket and store some objects
         bucket_name = 'dummy_bucket_12345_qwerty'
-
-        ret = boto3.resource('s3').Bucket(bucket_name).create()
+        self._create_mock_bucket(bucket_name)
 
         nodb = NoDB(bucket_name)
         nodb.index = "Name"
@@ -124,6 +124,9 @@ class TestNoDB(unittest.TestCase):
 
         all_objects = nodb.all()
         self.assertListEqual([{"Name": "John", "age": 19}, {"Name": "Jane", "age": 20}], all_objects)
+
+    def _create_mock_bucket(self, bucket_name):
+        boto3.resource('s3').Bucket(bucket_name).create()
 
 
 if __name__ == '__main__':
