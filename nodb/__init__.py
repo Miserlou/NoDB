@@ -142,7 +142,7 @@ class NoDB(object):
                     open(cache_path, 'w+').close()
 
                 with open(cache_path, "wb") as in_file:
-                    in_file.write(serialized.encode(self.encoding))
+                    in_file.write(serialized)
 
                 logging.debug("Wrote to cache file: " + cache_path)
 
