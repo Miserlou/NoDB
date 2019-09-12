@@ -113,6 +113,12 @@ class TestNoDB(unittest.TestCase):
         nodb.delete('Jeff')
         loaded = nodb.load("Jeff")
         self.assertIsNone(loaded)
+        # test read from bucket when cache enabled
+        # remove cached file
+        nodb.save(jeff)
+        if os.path.isfile(cache_path):
+            os.remove(cache_path)
+        nodb.load('Jeff')
 
         bcp = nodb._get_base_cache_path()
 
