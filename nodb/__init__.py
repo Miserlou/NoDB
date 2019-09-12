@@ -166,6 +166,14 @@ class NoDB(object):
         # First, calculate the real index
         real_index = self._format_index_value(index)
 
+        # handle delete from cache
+        if self.cache:
+            base_cache_path = self._get_base_cache_path()
+            cache_path = os.path.join(base_cache_path, real_index)
+            # Cache hit!
+            if os.path.isfile(cache_path):
+                os.remove(cache_path)
+
         # Next, get the bytes (if any)
         serialized_s3 = self.s3.Object(self.bucket, self.prefix + real_index)
         result = serialized_s3.delete()
