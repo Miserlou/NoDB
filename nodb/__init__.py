@@ -1,15 +1,15 @@
-from datetime import datetime
-from io import BytesIO
-
 import base64
-import boto3
-import botocore
 import hashlib
 import json
 import logging
 import os
 import tempfile
 import uuid
+from datetime import datetime
+from io import BytesIO
+
+import boto3
+import botocore
 
 try:
     import cPickle as pickle
@@ -56,7 +56,6 @@ class NoDB(object):
             session = boto3.session.Session(profile_name=self.profile_name)
         if session:
             self.s3 = session.resource('s3', config=botocore.client.Config(signature_version=self.signature_version))
-
 
     def save(self, obj, index=None):
         """
@@ -113,6 +112,7 @@ class NoDB(object):
 
         # If cache enabled, check local filestore for bytes
         cache_hit = False
+        cache_path = None
         if self.cache:
             base_cache_path = self._get_base_cache_path()
             cache_path = os.path.join(base_cache_path, real_index)
@@ -136,13 +136,16 @@ class NoDB(object):
                 return default
 
             # Store the cache result
-            if self.cache:
+            if self.cache and cache_path:
 
                 if not os.path.exists(cache_path):
                     open(cache_path, 'w+').close()
 
                 with open(cache_path, "wb") as in_file:
-                    in_file.write(serialized.encode(self.encoding))
+                    if type(serialized) is bytes:
+                        in_file.write(serialized)
+                    else:
+                        in_file.write(serialized.encode(self.encoding))
 
                 logging.debug("Wrote to cache file: " + cache_path)
 
@@ -152,9 +155,9 @@ class NoDB(object):
         # And return the data
         if metainfo:
             return deserialized['obj'], (
-                                            deserialized['dt'],
-                                            deserialized['uuid']
-                                        )
+                deserialized['dt'],
+                deserialized['uuid']
+            )
         else:
             return deserialized['obj']
 
