@@ -82,7 +82,9 @@ class TestNoDB(unittest.TestCase):
 
     @moto.mock_s3
     def test_nodb_cache(self):
-        nodb = NoDB('dummy')
+        bucket_name = 'dummy'
+        nodb = NoDB(bucket_name)
+        self._create_mock_bucket(bucket_name)
         nodb.index = "Name"
         nodb.cache = True
 
@@ -107,6 +109,10 @@ class TestNoDB(unittest.TestCase):
         self.assertEqual(loaded, jeff)
         loaded = nodb.load("Jeff", default="Booty")
         self.assertEqual(loaded, jeff)
+        # test the cached item is deleted
+        nodb.delete('Jeff')
+        loaded = nodb.load("Jeff")
+        self.assertIsNone(loaded)
 
         bcp = nodb._get_base_cache_path()
 
