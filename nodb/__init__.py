@@ -16,6 +16,7 @@ try:
 except Exception:
     import pickle
 
+
 class NoDB(object):
     """
     A NoDB connection object.
@@ -25,9 +26,7 @@ class NoDB(object):
     # Config
     ##
 
-    bucket = None
     backend = "s3"
-    region = "us-east-1"
     serializer = "pickle"
     index = "id"
     prefix = ".nodb/"
@@ -57,6 +56,8 @@ class NoDB(object):
     ##
     # Public Interfaces
     ##
+    def __init__(self, bucket):
+        self.bucket = bucket
 
     def save(self, obj, index=None):
         """
@@ -175,6 +176,26 @@ class NoDB(object):
         else:
             return False
 
+    def all(self, metainfo=False):
+        """
+        Retrieve all objects from the backend datastore.
+        :return: list of all objects
+        """
+        deserialized_objects = []
+
+        bucket = self.s3.Bucket(self.bucket)
+        for obj in bucket.objects.all():
+            serialized = obj.get()["Body"].read()
+            # deserialize and add to list
+            deserialized_objects.append(self._deserialize(serialized))
+
+        # sort by insert datetime
+        deserialized_objects.sort(key=lambda x: x['dt'])
+
+        if metainfo:
+            return deserialized_objects
+        else:
+            return [obj['obj'] for obj in deserialized_objects]
 
     ###
     # Private interfaces
