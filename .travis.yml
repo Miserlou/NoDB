@@ -1,6 +1,6 @@
 language: python
 python:
-#  - "2.7"
+  - "2.7"
   - "3.5"
   - "3.6"
   - "3.7"
@@ -13,7 +13,7 @@ install:
 # command to run tests
 env:
   - AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar TESTCASE=tests/tests.py
-script: 
+script:
   - nosetests $TESTCASE --with-coverage --cover-package=nodb --with-timer
     #  - coverage combine --append
 after_success:
