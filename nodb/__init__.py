@@ -235,6 +235,8 @@ class NoDB(object):
         """
 
         obj = None
+        if type(serialized) == bytes:
+            serialized = serialized.decode()
         deserialized = json.loads(serialized)
         return_me = {}
 
