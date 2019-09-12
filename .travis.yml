@@ -8,11 +8,12 @@ python:
 cache:
   - pip
 install:
+  - export BOTO_CONFIG=/dev/null
   - "pip install setuptools --upgrade; pip install -r test_requirements.txt; python setup.py install"
 # command to run tests
 env:
-  - TESTCASE=tests/tests.py
-script:
+  - AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar TESTCASE=tests/tests.py
+script: 
   - nosetests $TESTCASE --with-coverage --cover-package=nodb --with-timer
     #  - coverage combine --append
 after_success:
