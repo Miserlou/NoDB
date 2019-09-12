@@ -8,6 +8,7 @@ import unittest
 
 import boto3
 import moto
+from botocore.exceptions import NoCredentialsError, ProfileNotFound
 
 from nodb import NoDB
 
@@ -44,6 +45,7 @@ class TestNoDB(unittest.TestCase):
 
     def test_test(self):
         self.assertTrue(True)
+
     ##
     # Basic Tests
     ##
@@ -79,6 +81,25 @@ class TestNoDB(unittest.TestCase):
         nodb.save(jeff)
         possible_jeff = nodb.load('Jeff')
         self.assertEqual(possible_jeff, jeff)
+
+    @moto.mock_s3
+    def test_nodb_aws_profile_name(self):
+        # @bendog this should test that missing these values raises the correct exceptions
+        # there isn't a non destructive way to test profile for success
+        bucket_name = 'dummy_bucket'
+
+        self._create_mock_bucket(bucket_name)
+
+        with self.assertRaises(ProfileNotFound):
+            NoDB(bucket_name, profile_name='this_will_definitely_break')
+        # # @bendog i'm not sure how to get thise working on travis-ci
+        # nodb = NoDB(bucket_name, profile_name='default')
+        # nodb.index = "Name"
+        #
+        # jeff = {"Name": "Jeff", "age": 19}
+        #
+        # with self.assertRaises(NoCredentialsError):
+        #     nodb.save(jeff)
 
     @moto.mock_s3
     def test_nodb_cache(self):
