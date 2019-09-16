@@ -25,7 +25,6 @@ class NoDB(object):
     ##
     # Config
     ##
-
     backend = "s3"
     serializer = "pickle"
     index = "id"
@@ -34,6 +33,7 @@ class NoDB(object):
     cache = False
     encoding = 'utf8'
     profile_name = None
+    bucket = None
 
     s3 = boto3.resource('s3', config=botocore.client.Config(signature_version=signature_version))
 
@@ -49,9 +49,9 @@ class NoDB(object):
     # Public Interfaces
     ##
 
-    def __init__(self, bucket, profile_name=None, session=None):
-        # @bendog bucket used to be configurable via class attributes rather than passed to init
-        self.bucket = bucket
+    def __init__(self, bucket=None, profile_name=None, session=None):
+        if bucket:
+            self.bucket = bucket
         if profile_name:
             self.profile_name = profile_name
         if self.profile_name:
