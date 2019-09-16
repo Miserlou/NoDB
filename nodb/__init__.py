@@ -1,15 +1,15 @@
-from datetime import datetime
-from io import BytesIO
-
 import base64
-import boto3
-import botocore
 import hashlib
 import json
 import logging
 import os
 import tempfile
 import uuid
+from datetime import datetime
+from io import BytesIO
+
+import boto3
+import botocore
 
 try:
     import cPickle as pickle
@@ -37,14 +37,6 @@ class NoDB(object):
 
     s3 = boto3.resource('s3', config=botocore.client.Config(signature_version=signature_version))
 
-    def __init__(self, profile_name=None, session=None):
-        if profile_name:
-            self.profile_name = profile_name
-        if self.profile_name:
-            session = boto3.session.Session(profile_name=self.profile_name)
-        if session:
-            self.s3 = session.resource('s3', config=botocore.client.Config(signature_version=self.signature_version))
-
     ##
     # Advanced config
     ##
@@ -56,8 +48,16 @@ class NoDB(object):
     ##
     # Public Interfaces
     ##
-    def __init__(self, bucket):
+
+    def __init__(self, bucket, profile_name=None, session=None):
+        # @bendog bucket used to be configurable via class attributes rather than passed to init
         self.bucket = bucket
+        if profile_name:
+            self.profile_name = profile_name
+        if self.profile_name:
+            session = boto3.session.Session(profile_name=self.profile_name)
+        if session:
+            self.s3 = session.resource('s3', config=botocore.client.Config(signature_version=self.signature_version))
 
     def save(self, obj, index=None):
         """
@@ -153,9 +153,9 @@ class NoDB(object):
         # And return the data
         if metainfo:
             return deserialized['obj'], (
-                                            deserialized['dt'],
-                                            deserialized['uuid']
-                                        )
+                deserialized['dt'],
+                deserialized['uuid']
+            )
         else:
             return deserialized['obj']
 
