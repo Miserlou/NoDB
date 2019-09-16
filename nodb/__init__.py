@@ -48,7 +48,9 @@ class NoDB(object):
     ##
     # Public Interfaces
     ##
+
     def __init__(self, bucket, profile_name=None, session=None):
+        # @bendog bucket used to be configurable via class attributes rather than passed to init
         self.bucket = bucket
         if profile_name:
             self.profile_name = profile_name
