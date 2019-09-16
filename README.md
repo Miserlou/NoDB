@@ -77,17 +77,44 @@ Here's the same example, but with a class. Note the import and configuration is 
 class User(object):
     name = None
     age = None
-
+    
     def print_name(self):
         print("Hi, I'm " + self.name + "!")
+    
+    def __repr__(self):
+        """ show a human readable representation of this class """
+        return "<%s: %s (%s)>" % (self.__class__.__name__, self.name, self.age)
 
 new_user = User()
 new_user.name = "Jeff"
 new_user.age = 19
-nodb.save(new_user) # True
+nodb.save(new_user) 
+# True
 
 jeff = nodb.load("Jeff")
-jeff.print_name() # Hi, I'm Jeff!
+jeff.print_name() 
+# Hi, I'm Jeff!
+```
+
+You can return a list of all objects using the .all() method.
+
+Here's an example following from the code above, adding some extra users to the database and then listing all. 
+
+```python
+newer_user = User()
+newer_user.name = "Ben"
+newer_user.age = 38
+nodb.save(newer_user)
+# True
+
+newest_user = User()
+newest_user.name = "Thea"
+newest_user.age = 33
+nodb.save(newest_user)
+# True
+
+nodb.all()
+# [<User: Jeff (19)>, <User: Ben (38)>, <User: Thea (33)>]
 ```
 
 ## Advanced Usage
