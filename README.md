@@ -50,8 +50,7 @@ You simply make a NoDB object, point it to your bucket and tell it what field yo
 ```python
 from nodb import NoDB
 
-nodb = NoDB()
-nodb.bucket = "my-s3-bucket"
+nodb = NoDB("my-s3-bucket")
 nodb.index = "name"
 ```
 
