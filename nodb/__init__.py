@@ -114,6 +114,7 @@ class NoDB(object):
 
         # If cache enabled, check local filestore for bytes
         cache_hit = False
+        cache_path = None
         if self.cache:
             base_cache_path = self._get_base_cache_path()
             cache_path = os.path.join(base_cache_path, real_index)
@@ -137,13 +138,16 @@ class NoDB(object):
                 return default
 
             # Store the cache result
-            if self.cache:
+            if self.cache and cache_path:
 
                 if not os.path.exists(cache_path):
                     open(cache_path, 'w+').close()
 
                 with open(cache_path, "wb") as in_file:
-                    in_file.write(serialized.encode(self.encoding))
+                    if type(serialized) is bytes:
+                        in_file.write(serialized)
+                    else:
+                        in_file.write(serialized.encode(self.encoding))
 
                 logging.debug("Wrote to cache file: " + cache_path)
 
@@ -166,6 +170,14 @@ class NoDB(object):
 
         # First, calculate the real index
         real_index = self._format_index_value(index)
+
+        # handle delete from cache
+        if self.cache:
+            base_cache_path = self._get_base_cache_path()
+            cache_path = os.path.join(base_cache_path, real_index)
+            # Cache hit!
+            if os.path.isfile(cache_path):
+                os.remove(cache_path)
 
         # Next, get the bytes (if any)
         serialized_s3 = self.s3.Object(self.bucket, self.prefix + real_index)
