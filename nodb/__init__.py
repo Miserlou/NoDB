@@ -37,8 +37,8 @@ class NoDB(object):
     bucket = None
     invalid_s3_path_pattern = re.compile("[^0-9a-zA-Z!\-_.*'()/]")
     custom_index_func = None
-
-    s3 = boto3.resource('s3', config=botocore.client.Config(signature_version=signature_version))
+    region = None
+    s3 = boto3.resource('s3', config=botocore.client.Config(signature_version=signature_version, region_name=region), region_name=region)
 
     ##
     # Advanced config
@@ -60,7 +60,7 @@ class NoDB(object):
         if self.profile_name:
             session = boto3.session.Session(profile_name=self.profile_name)
         if session:
-            self.s3 = session.resource('s3', config=botocore.client.Config(signature_version=self.signature_version))
+            self.s3 = session.resource('s3', config=botocore.client.Config(signature_version=self.signature_version), region_name=region)
 
     def save(self, obj, index=None):
         """
@@ -85,6 +85,7 @@ class NoDB(object):
 
         s3_object = self.s3.Object(self.bucket, self.prefix + real_index)
         result = s3_object.put('rb', Body=bytesIO)
+        logging.basicConfig(level=logging.DEBUG)
         logging.debug("Put remote bytes: " + self.prefix + real_index)
 
         if result['ResponseMetadata']['HTTPStatusCode'] == 200:
@@ -97,8 +98,8 @@ class NoDB(object):
 
             base_cache_path = self._get_base_cache_path()
             cache_path = os.path.join(base_cache_path, real_index)
-            if not os.path.exists(cache_path):
-                open(cache_path, 'w+').close()
+            if not os.path.exists(os.path.dirname(os.path.abspath(cache_path))):
+                os.makedirs(os.path.dirname(os.path.abspath(cache_path)))
             with open(cache_path, "wb") as in_file:
                 in_file.write(serialized.encode(self.encoding))
             logging.debug("Wrote to cache file: " + cache_path)
@@ -142,12 +143,11 @@ class NoDB(object):
             # Store the cache result
             if self.cache:
 
-                if not os.path.exists(cache_path):
-                    open(cache_path, 'w+').close()
+                if not os.path.exists(os.path.dirname(os.path.abspath(cache_path))):
+                    os.makedirs(os.path.dirname(os.path.abspath(cache_path)))
 
                 with open(cache_path, "wb") as in_file:
                     in_file.write(serialized.encode(self.encoding))
-
                 logging.debug("Wrote to cache file: " + cache_path)
 
         # Then read the data format
@@ -187,24 +187,66 @@ class NoDB(object):
         if subpath and not self.human_readable_indexes:
             raise Exception("Subpath query only supported when human_readable_indexes=True")
 
+        serialized_objects = []
+
         deserialized_objects = []
 
-        bucket = self.s3.Bucket(self.bucket)
-        if subpath:
-            if subpath.startswith("/"):
-                subpath = subpath[1:]
-            s3_prefix = self.prefix + subpath
-            bucket_enumerator = bucket.objects.filter(Prefix=s3_prefix)
-        else:
-            bucket_enumerator = bucket.objects.all()
+        # If cache enabled, check local filestore for bytes
+        cache_hit = False
+        if self.cache:
+            index = (subpath or "all") + "-all"
+            real_index = self._format_index_value(index)
+            base_cache_path = self._get_base_cache_path()
+            cache_path = os.path.join(base_cache_path, real_index)
+            # Cache hit!
+            if os.path.isfile(cache_path):
+                with open(cache_path, "rb") as in_file:
+                    # serialized = in_file.read()
+                    serialized_objects = pickle.load(in_file)
+                    deserialized_objects = [self._deserialize(o) for o in serialized_objects]
+                cache_hit = True
+                logging.debug("Loaded bytes from cache file: " + cache_path)
+            else:
+                cache_hit = False
 
-        for obj in bucket_enumerator:
-            serialized = obj.get()["Body"].read()
-            # deserialize and add to list
-            deserialized_objects.append(self._deserialize(serialized))
+        # Next, get the bytes (if any)
+        if not self.cache or not cache_hit:
 
-        # sort by insert datetime
-        deserialized_objects.sort(key=lambda x: x['dt'])
+            bucket = self.s3.Bucket(self.bucket)
+            if subpath:
+                if subpath.startswith("/"):
+                    subpath = subpath[1:]
+                s3_prefix = self.prefix + subpath
+                bucket_enumerator = bucket.objects.filter(Prefix=s3_prefix)
+            else:
+                bucket_enumerator = bucket.objects.all()
+
+            try:
+                for obj in bucket_enumerator:
+                    serialized = obj.get()["Body"].read()
+                    serialized_objects.append(serialized)
+
+                    # deserialize and add to list
+                    deserialized_objects.append(self._deserialize(serialized))
+
+
+            except botocore.exceptions.ClientError as e:
+                # No Key? Return default.
+                logging.debug("No remote objects, returning default.")
+                return []
+
+            # Store the cache result
+            if self.cache:
+                if not os.path.exists(os.path.dirname(os.path.abspath(cache_path))):
+                    os.makedirs(os.path.dirname(os.path.abspath(cache_path)))
+
+                with open(cache_path, "wb") as in_file:
+                    pickle.dump(serialized_objects, in_file)
+                    # in_file.write(serialized_objects.encode(self.encoding))
+                logging.debug("Wrote to cache file: " + cache_path)
+
+            # sort by insert datetime
+            deserialized_objects.sort(key=lambda x: x['dt'])
 
         if metainfo:
             return deserialized_objects
