@@ -7,6 +7,7 @@ import tempfile
 import uuid
 from datetime import datetime
 from io import BytesIO
+import re
 
 import boto3
 import botocore
@@ -34,6 +35,7 @@ class NoDB(object):
     encoding = 'utf8'
     profile_name = None
     bucket = None
+    invalid_s3_path_pattern = re.compile("[^0-9a-zA-Z!\-_.*'()/]")
 
     s3 = boto3.resource('s3', config=botocore.client.Config(signature_version=signature_version))
 
@@ -176,15 +178,26 @@ class NoDB(object):
         else:
             return False
 
-    def all(self, metainfo=False):
+    def all(self, metainfo=False, subpath=''):
         """
         Retrieve all objects from the backend datastore.
         :return: list of all objects
         """
+        if subpath and not self.human_readable_indexes:
+            raise Exception("Subpath query only supported when human_readable_indexes=True")
+
         deserialized_objects = []
 
         bucket = self.s3.Bucket(self.bucket)
-        for obj in bucket.objects.all():
+        if subpath:
+            if subpath.startswith("/"):
+                subpath = subpath[1:]
+            s3_prefix = self.prefix + subpath
+            bucket_enumerator = bucket.objects.filter(Prefix=s3_prefix)
+        else:
+            bucket_enumerator = bucket.objects.all()
+
+        for obj in bucket_enumerator:
             serialized = obj.get()["Body"].read()
             # deserialize and add to list
             deserialized_objects.append(self._deserialize(serialized))
@@ -287,10 +300,15 @@ class NoDB(object):
         logging.debug("Formatting index value: " + str(index_value))
 
         if self.human_readable_indexes:
-            # You are on your own here! This may not work!
-            return index_value
+            return self._escape_path_s3(index_value)
         else:
             return self.hash_function(index_value.encode(self.encoding)).hexdigest()
+
+    def _escape_path_s3(self, path):
+        if re.search(self.invalid_s3_path_pattern, path):
+            logging.warning('Object path with disallowed characters (replaced with \'-\'): ' + path)
+            return re.sub(self.invalid_s3_path_pattern, "-", path)
+        return path
 
     def _get_base_cache_path(self):
         """
