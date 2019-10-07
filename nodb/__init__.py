@@ -36,6 +36,7 @@ class NoDB(object):
     profile_name = None
     bucket = None
     invalid_s3_path_pattern = re.compile("[^0-9a-zA-Z!\-_.*'()/]")
+    custom_index_func = None
 
     s3 = boto3.resource('s3', config=botocore.client.Config(signature_version=signature_version))
 
@@ -279,7 +280,9 @@ class NoDB(object):
         """
 
         index_value = None
-        if type(obj) is dict:
+        if self.custom_index_func:
+           index_value = self.custom_index_func(obj, index)
+        elif type(obj) is dict:
             if index in obj:
                 index_value = obj[index]
             else:
