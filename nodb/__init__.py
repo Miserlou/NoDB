@@ -101,7 +101,8 @@ class NoDB(object):
             if not os.path.exists(os.path.dirname(os.path.abspath(cache_path))):
                 os.makedirs(os.path.dirname(os.path.abspath(cache_path)))
             with open(cache_path, "wb") as in_file:
-                in_file.write(serialized.encode(self.encoding))
+                serialized = pickle.dump(serialized, in_file)
+                # in_file.write(serialized.encode(self.encoding))
             logging.debug("Wrote to cache file: " + cache_path)
 
         return resp
@@ -124,7 +125,8 @@ class NoDB(object):
             # Cache hit!
             if os.path.isfile(cache_path):
                 with open(cache_path, "rb") as in_file:
-                    serialized = in_file.read()
+                    serialized = pickle.load(in_file)
+                    # serialized = in_file.read()
                 cache_hit = True
                 logging.debug("Loaded bytes from cache file: " + cache_path)
             else:
@@ -147,7 +149,8 @@ class NoDB(object):
                     os.makedirs(os.path.dirname(os.path.abspath(cache_path)))
 
                 with open(cache_path, "wb") as in_file:
-                    in_file.write(serialized.encode(self.encoding))
+                    pickle.dump(serialized, in_file)
+                    # in_file.write(serialized.encode(self.encoding))
                 logging.debug("Wrote to cache file: " + cache_path)
 
         # Then read the data format
