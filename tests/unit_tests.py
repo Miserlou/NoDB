@@ -146,6 +146,28 @@ class TestNoDB(unittest.TestCase):
         all_objects = nodb.all()
         self.assertListEqual([{"Name": "John", "age": 19}, {"Name": "Jane", "age": 20}], all_objects)
 
+    @moto.mock_s3
+    def test_nodb_all_subpath(self):
+        # create dummy bucket and store some objects
+        bucket_name = 'dummy_bucket_12345_qwerty'
+        self._create_mock_bucket(bucket_name)
+
+        nodb = NoDB(bucket_name)
+        nodb.human_readable_indexes = True
+        nodb.index = "path"
+
+        jeff = {"Name": "Jeff", "age": 19, "path": "persons/jeff", "type": "person"}
+        michael = {"Name": "Michael", "age": 19, "path": "persons/michael", "type": "person"}
+        car = {"Name": "Acura TSX", "path": "vehicles/car", "type": "vehicle"}
+
+        nodb.save(jeff)
+        nodb.save(michael)
+        nodb.save(car)
+
+        persons = nodb.all(subpath="persons/")
+        self.assertListEqual([jeff, michael], persons)
+
+
     def _create_mock_bucket(self, bucket_name):
         boto3.resource('s3').Bucket(bucket_name).create()
 

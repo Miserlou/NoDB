@@ -10,7 +10,7 @@ install:
   - "pip install setuptools --upgrade; pip install -r test_requirements.txt; python setup.py install"
 # command to run tests
 env:
-  - AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar TESTCASE=tests/tests.py
+  - AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar TESTCASE=tests/unit_tests.py
 script: 
   - nosetests $TESTCASE --with-coverage --cover-package=nodb --with-timer
     #  - coverage combine --append
