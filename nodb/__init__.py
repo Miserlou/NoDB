@@ -28,7 +28,7 @@ class NoDB(object):
     backend = "s3"
     serializer = "pickle"
     index = "id"
-    prefix = ".nodb/"
+    prefix = None
     signature_version = "s3v4"
     cache = False
     encoding = 'utf8'
@@ -49,7 +49,14 @@ class NoDB(object):
     # Public Interfaces
     ##
 
-    def __init__(self, bucket=None, profile_name=None, session=None):
+    def __init__(self, bucket=None, prefix=".nodb/", profile_name=None, session=None):
+
+        if not prefix == ".nodb/":
+            prefix = os.path.join(prefix, '')  # make sure ends with '/'
+            prefix = prefix if prefix.startswith('.') else '.'.join(['', prefix])  # make sure begins with '.'
+
+        self.prefix = prefix
+
         if bucket:
             self.bucket = bucket
         if profile_name:
@@ -80,7 +87,7 @@ class NoDB(object):
         bytesIO.write(serialized.encode(self.encoding))
         bytesIO.seek(0)
 
-        s3_object = self.s3.Object(self.bucket, self.prefix + real_index)
+        s3_object = self.s3.Object(bucket_name=self.bucket, key=self.prefix + real_index)
         result = s3_object.put('rb', Body=bytesIO)
         logging.debug("Put remote bytes: " + self.prefix + real_index)
 
@@ -153,9 +160,9 @@ class NoDB(object):
         # And return the data
         if metainfo:
             return deserialized['obj'], (
-                deserialized['dt'],
-                deserialized['uuid']
-            )
+                    deserialized['dt'],
+                    deserialized['uuid']
+                    )
         else:
             return deserialized['obj']
 
@@ -178,9 +185,10 @@ class NoDB(object):
 
     def all(self, metainfo=False):
         """
-        Retrieve all objects from the backend datastore.
+        Retrieve up to 1000 objects from the backend datastore.
         :return: list of all objects
         """
+
         deserialized_objects = []
 
         bucket = self.s3.Bucket(self.bucket)
@@ -297,7 +305,7 @@ class NoDB(object):
         Make sure that the cache directory is real. Returns the path.
         """
 
-        base_cache_path = os.path.join(self.cache_dir, '.nodb')
+        base_cache_path = os.path.join(self.cache_dir, self.prefix)
         if not os.path.isdir(base_cache_path):
             os.makedirs(base_cache_path)
         return base_cache_path

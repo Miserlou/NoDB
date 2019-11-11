@@ -8,7 +8,7 @@ import unittest
 
 import boto3
 import moto
-from botocore.exceptions import NoCredentialsError, ProfileNotFound
+from botocore.exceptions import ProfileNotFound
 
 from nodb import NoDB
 
@@ -145,6 +145,23 @@ class TestNoDB(unittest.TestCase):
 
         all_objects = nodb.all()
         self.assertListEqual([{"Name": "John", "age": 19}, {"Name": "Jane", "age": 20}], all_objects)
+
+    @moto.mock_s3
+    def test_nodb_custom_prefix_save_load(self):
+        # create dummy bucket and store some objects
+        bucket_name = 'dummy_bucket'
+
+        self._create_mock_bucket(bucket_name)
+
+        nodb = NoDB(bucket_name, prefix='JeffPrefix')
+        nodb.index = "Name"
+
+        jeff = {"Name": "Jeff", "age": 19}
+
+        nodb.save(jeff)
+        possible_jeff = nodb.load('Jeff')
+        self.assertEqual(nodb.prefix, '.JeffPrefix/')
+        self.assertEqual(possible_jeff, jeff)
 
     def _create_mock_bucket(self, bucket_name):
         boto3.resource('s3').Bucket(bucket_name).create()
