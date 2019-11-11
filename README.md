@@ -45,7 +45,7 @@ $ pip install nodb
 
 **NoDB** is super easy to use!
 
-You simply make a NoDB object, point it to your bucket and tell it what field you want to index on.
+You simply make a NoDB object, point it to your bucket, and tell it what field you want to index on.
 
 ```python
 from nodb import NoDB
@@ -67,6 +67,13 @@ print(user['age']) # 19
 
 # Delete our object
 nodb.delete("Jeff") # True
+```
+The data files are stored in your bucket under a folder named `.nodb` however, you can customize it  passing in the parameter `prefix` when initializing the `NoDb` class.
+```python
+from nodb import NoDB
+
+nodb = NoDB("my-s3-bucket", prefix='clients') 
+# This will create a folder called .clients under my-s3-bucket 
 ```
 
 By default, you can save and load any Python object.
