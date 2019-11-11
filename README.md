@@ -45,7 +45,7 @@ $ pip install nodb
 
 **NoDB** is super easy to use!
 
-You simply make a NoDB object, point it to your bucket, and tell it what field you want to index on.
+You simply make a NoDB object, point it to your bucket and tell it what field you want to index on.
 
 ```python
 from nodb import NoDB
