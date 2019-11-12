@@ -28,12 +28,9 @@ class NoDB(object):
     backend = "s3"
     serializer = "pickle"
     index = "id"
-    prefix = None
     signature_version = "s3v4"
     cache = False
     encoding = 'utf8'
-    profile_name = None
-    bucket = None
 
     s3 = boto3.resource('s3', config=botocore.client.Config(signature_version=signature_version))
 
@@ -49,19 +46,16 @@ class NoDB(object):
     # Public Interfaces
     ##
 
-    def __init__(self, bucket=None, prefix=".nodb/", profile_name=None, session=None):
+    def __init__(self, bucket, prefix=".nodb/", profile_name=None, session=None):
 
         if not prefix == ".nodb/":
             prefix = os.path.join(prefix, '')  # make sure ends with '/'
             prefix = prefix if prefix.startswith('.') else '.'.join(['', prefix])  # make sure begins with '.'
 
         self.prefix = prefix
-
-        if bucket:
-            self.bucket = bucket
+        self.bucket = bucket
         if profile_name:
             self.profile_name = profile_name
-        if self.profile_name:
             session = boto3.session.Session(profile_name=self.profile_name)
         if session:
             self.s3 = session.resource('s3', config=botocore.client.Config(signature_version=self.signature_version))
