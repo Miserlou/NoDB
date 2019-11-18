@@ -1,3 +1,10 @@
+## 0.5.1
+* Enhanced testing and increased coverage
+* Fixed bug with .delete not removing an item from the cache
+
+## 0.5.0
+* Added .all() method
+
 ## 0.4.0
 * Python3 support added
 
