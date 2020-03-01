@@ -4,4 +4,4 @@ appdirs>=1.4.3
 funcsigs>=1.0.2
 packaging>=16.8
 pbr>=2.0.0
-importlib-resources>=1.1.0 ; python_version < '3.7'
+importlib-resources>=1.0.2 ; python_version < '3.7'
