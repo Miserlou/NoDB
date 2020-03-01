@@ -8,6 +8,7 @@
 [![Slack](https://img.shields.io/badge/chat-slack-ff69b4.svg)](https://slack.zappa.io/)
 [![Gun.io](https://img.shields.io/badge/made%20by-gun.io-blue.svg)](https://gun.io/)
 [![Patreon](https://img.shields.io/badge/support-patreon-brightgreen.svg)](https://patreon.com/zappa)
+<!-- ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/nodb) -->
 
 _NoDB isn't a database.. but it sort of looks like one!_
 

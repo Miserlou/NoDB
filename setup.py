@@ -17,9 +17,10 @@ with open(os.path.join(os.path.dirname(__file__), 'test_requirements.txt')) as f
 
 setup(
     name='nodb',
-    version='0.5.1',
+    version='0.5.2',
     packages=['nodb'],
     install_requires=required,
+    extras_require={':python_version<"3.7"': ['importlib-resources']},
     tests_require=test_required,
     test_suite='nose.collector',
     include_package_data=True,
@@ -36,6 +37,9 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],

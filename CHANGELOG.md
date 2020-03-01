@@ -1,3 +1,8 @@
+## 0.5.2
+* added more test cases for .all
+* added python 3.8 support in tests
+* specified additonal packages for python3.6
+
 ## 0.5.1
 * Enhanced testing and increased coverage
 * Fixed bug with .delete not removing an item from the cache
