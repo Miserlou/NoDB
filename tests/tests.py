@@ -17,6 +17,7 @@ def random_string(length):
     return ''.join(random.choice(string.printable) for _ in range(length))
 
 
+# noinspection DuplicatedCode
 class TestNoDB(unittest.TestCase):
     # def setUp(self):
     #     self.sleep_patch = mock.patch('time.sleep', return_value=None)
@@ -144,9 +145,20 @@ class TestNoDB(unittest.TestCase):
         bcp = nodb._get_base_cache_path()
 
     @moto.mock_s3
-    def test_nodb_all(self):
+    def test_nodb_all_empty(self):
         # create dummy bucket and store some objects
-        bucket_name = 'dummy_bucket_12345_qwerty'
+        bucket_name = 'dummy_bucket_all_empty'
+        self._create_mock_bucket(bucket_name)
+
+        nodb = NoDB(bucket_name)
+        nodb.index = "Name"
+
+        self.assertListEqual([], nodb.all())
+
+    @moto.mock_s3
+    def test_nodb_all_results(self):
+        # create dummy bucket and store some objects
+        bucket_name = 'dummy_bucket_all_results'
         self._create_mock_bucket(bucket_name)
 
         nodb = NoDB(bucket_name)
@@ -155,8 +167,22 @@ class TestNoDB(unittest.TestCase):
         nodb.save({"Name": "John", "age": 19})
         nodb.save({"Name": "Jane", "age": 20})
 
-        all_objects = nodb.all()
-        self.assertListEqual([{"Name": "John", "age": 19}, {"Name": "Jane", "age": 20}], all_objects)
+        self.assertListEqual([{"Name": "John", "age": 19}, {"Name": "Jane", "age": 20}], nodb.all())
+
+    @moto.mock_s3
+    def test_nodb_all_json_results(self):
+        # create dummy bucket and store some objects
+        bucket_name = 'dummy_bucket_all_json'
+        self._create_mock_bucket(bucket_name)
+
+        nodb = NoDB(bucket_name)
+        nodb.index = "Name"
+        nodb.serializer = "json"
+
+        nodb.save({"Name": "John", "age": 19})
+        nodb.save({"Name": "Jane", "age": 20})
+
+        self.assertListEqual([{"Name": "John", "age": 19}, {"Name": "Jane", "age": 20}], nodb.all())
 
     def _create_mock_bucket(self, bucket_name):
         boto3.resource('s3').Bucket(bucket_name).create()

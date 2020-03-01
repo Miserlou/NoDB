@@ -4,12 +4,13 @@ python:
   - "3.5"
   - "3.6"
   - "3.7"
+  - "3.8"
 # command to install dependencies
 cache:
   - pip
 install:
   - export BOTO_CONFIG=/dev/null
-  - "pip install setuptools --upgrade; pip install -r test_requirements.txt; python setup.py install"
+  - "pip install setuptools --upgrade; pip install --upgrade -r test_requirements.txt; python setup.py install"
 # command to run tests
 env:
   - AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar TESTCASE=tests/tests.py
