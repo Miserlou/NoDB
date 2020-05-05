@@ -81,7 +81,7 @@ class NoDB(object):
         bytesIO.seek(0)
 
         s3_object = self.s3.Object(self.bucket, self.prefix + real_index)
-        result = s3_object.put('rb', Body=bytesIO)
+        result = s3_object.put(Body=bytesIO)
         logging.debug("Put remote bytes: " + self.prefix + real_index)
 
         if result['ResponseMetadata']['HTTPStatusCode'] == 200:
